@@ -14,7 +14,7 @@
 
 ## Installation
 1. Open **Burp Suite**.
-2. Navigate to `Extender` > `BApp Store` and search for **Burparser Pro**.
+2. Download the extension from the repository and then install it manually by navigating to `Extender` > `Extensions` > `Add`, selecting the downloaded file, and ensuring Jython is properly configured in `Extender` > `Options` > `Python Environment`.
 3. Click `Install` or manually add the Jython script in `Extender` > `Extensions` > `Add`.
 4. Ensure **Jython** is configured in `Extender` > `Options` > `Python Environment`.
 
@@ -48,3 +48,4 @@ MIT License - Feel free to use, modify, and distribute.
 
 ## Contact
 For support or feature requests, open an issue on the **GitHub repository**.
+
