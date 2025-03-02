@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from burp import IBurpExtender, IHttpListener, ITab, IContextMenuFactory, IContextMenuInvocation, IScannerCheck
 from javax.swing import JPanel, JTextArea, JScrollPane, BoxLayout, JButton, JLabel, JTextField, JCheckBox, JFileChooser, JSplitPane, JTabbedPane, JTable, JOptionPane, SwingUtilities, JMenuItem, JComboBox, JDialog, BorderFactory
 from javax.swing.table import DefaultTableModel
@@ -8,6 +10,7 @@ from java.io import File, PrintWriter, BufferedWriter, FileWriter
 from java.lang import Thread as JThread
 from threading import Lock, Thread
 from urlparse import urljoin, urlparse
+import codecs
 import re
 import json
 import time
@@ -794,7 +797,7 @@ class BurpExtender(IBurpExtender, IHttpListener, ITab, IContextMenuFactory, ISca
                             final_wordlist.add(path + ext)
             
             # Write to file
-            with open(file_path, 'w') as f:
+            with codecs.open(file_path, 'w', encoding='utf-8') as f:
                 for path in sorted(final_wordlist):
                     f.write(path + "\n")
                     
@@ -989,24 +992,23 @@ class BurpExtender(IBurpExtender, IHttpListener, ITab, IContextMenuFactory, ISca
         try:
             selected_messages = invocation.getSelectedMessages()
             processed_urls = set()  # To avoid duplicates
-            
+
             if selected_messages and len(selected_messages) > 0:
                 # Get base URLs from selected messages
                 base_urls = []
                 for message in selected_messages:
-                    url = message.getUrl()
+                    url = message.getUrl().toString().encode('utf-8')  # 🔥 Fix here
                     if url:
-                        base_url = str(url)
-                        base_urls.append(base_url)
-                        
+                        base_urls.append(url)
+
                 # Get all sitemap entries
                 sitemap_entries = self._callbacks.getSiteMap(None)
                 count = 0
-                
+
                 # Process each site map entry
                 for entry in sitemap_entries:
-                    entry_url = str(entry.getUrl())
-                    
+                    entry_url = entry.getUrl().toString().encode('utf-8')  # 🔥 Fix here
+
                     # Check if this URL is under any of our base URLs
                     if entry_url not in processed_urls:
                         for base_url in base_urls:
@@ -1015,16 +1017,17 @@ class BurpExtender(IBurpExtender, IHttpListener, ITab, IContextMenuFactory, ISca
                                 processed_urls.add(entry_url)
                                 count += 1
                                 break
-                
+
                 # Update display
                 SwingUtilities.invokeLater(self.update_results_display)
-                
+
                 JOptionPane.showMessageDialog(self.tab, 
                     "Extracted paths from %d items in the directory tree." % count,
                     "Tree Extraction Complete",
                     JOptionPane.INFORMATION_MESSAGE)
         except Exception as e:
-            self._callbacks.printError("Error extracting directory tree: %s\n%s" % (str(e), traceback.format_exc()))
+            self._callbacks.printError("Error extracting directory tree: {}\n{}".format(str(e), traceback.format_exc()))
+
 
     def is_subpath_of(self, url, base_url):
         """Check if url is a subpath of base_url"""
