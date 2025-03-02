@@ -157,7 +157,7 @@ class BurpExtender(IBurpExtender, IHttpListener, ITab, IContextMenuFactory, ISca
                 
                 # Extract numeric IDs separately
                 if part.isdigit():
-                    self.extracted_paths.add(f"ID-{part}")
+                    self.extracted_paths.add("ID-{}".format(part))
 
             # Extract parameters with potential sensitive data
             if parsed.query:
@@ -169,14 +169,14 @@ class BurpExtender(IBurpExtender, IHttpListener, ITab, IContextMenuFactory, ISca
 
                         # Detect sensitive values (UUID, Base64, hashes)
                         if re.match(r'^[0-9a-fA-F]{32,64}$', value):
-                            self.extracted_paths.add(f"HASH-{key}")
+                            self.extracted_paths.add("HASH-{}".format(key))
                         elif re.match(r'^[0-9]+$', value):
-                            self.extracted_paths.add(f"NUM-{key}")
+                            self.extracted_paths.add("NUM-" + str(key))
                         elif re.match(r'^[A-Za-z0-9+/=]{20,}$', value):  # Base64
-                            self.extracted_paths.add(f"BASE64-{key}")
+                            self.extracted_paths.add("NUM-" + str(key))
 
         except Exception as e:
-            self._callbacks.printError(f"Error extracting path: {str(e)}\n{traceback.format_exc()}")
+            self._callbacks.printError("Error extracting path: {}\n{}".format(str(e), traceback.format_exc()))
 
 
     def extract_url_parts(self, url):
